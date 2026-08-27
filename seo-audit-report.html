@@ -1,0 +1,740 @@
+<title>Codeksha Homepage SEO Audit</title>
+<style>
+:root {
+  --bg: #f7f8fb;
+  --surface: #ffffff;
+  --surface-alt: #eef1f7;
+  --border: #dde3ec;
+  --ink: #1b2333;
+  --muted: #5b6472;
+  --accent: #2657eb;
+  --accent-soft: #e8edfc;
+  --good: #1f7a52;
+  --good-soft: #e5f4ec;
+  --warn: #b45309;
+  --warn-soft: #fbf0e0;
+  --bad: #b91c1c;
+  --bad-soft: #fbe9e9;
+  --code-bg: #11141c;
+  --code-ink: #dbe2f0;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #10141d;
+    --surface: #171c27;
+    --surface-alt: #1e2431;
+    --border: #2a3242;
+    --ink: #e7ebf3;
+    --muted: #9aa5b8;
+    --accent: #7b96ff;
+    --accent-soft: #1f2740;
+    --good: #35c281;
+    --good-soft: #14261f;
+    --warn: #e0a539;
+    --warn-soft: #2b2313;
+    --bad: #f0625f;
+    --bad-soft: #2c1717;
+    --code-bg: #0b0d13;
+    --code-ink: #d7deec;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #10141d;
+  --surface: #171c27;
+  --surface-alt: #1e2431;
+  --border: #2a3242;
+  --ink: #e7ebf3;
+  --muted: #9aa5b8;
+  --accent: #7b96ff;
+  --accent-soft: #1f2740;
+  --good: #35c281;
+  --good-soft: #14261f;
+  --warn: #e0a539;
+  --warn-soft: #2b2313;
+  --bad: #f0625f;
+  --bad-soft: #2c1717;
+  --code-bg: #0b0d13;
+  --code-ink: #d7deec;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Public Sans', system-ui, -apple-system, sans-serif;
+  font-size: 15.5px;
+  line-height: 1.65;
+  margin: 0;
+}
+h1, h2, h3, h4 {
+  font-family: 'Fraunces', Georgia, serif;
+  color: var(--ink);
+  line-height: 1.25;
+  text-wrap: balance;
+  font-weight: 600;
+}
+code, pre, .mono, .num { font-family: 'IBM Plex Mono', ui-monospace, monospace; }
+a { color: var(--accent); }
+p { max-width: 72ch; }
+
+.layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  max-width: 1320px;
+  margin: 0 auto;
+  gap: 0;
+}
+
+/* ---------- Header band ---------- */
+.header-band {
+  grid-column: 1 / -1;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 36px 40px 28px;
+}
+.header-band .kicker {
+  font-size: 12.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+.header-band h1 { font-size: 30px; margin: 0 0 8px; }
+.header-band .subtitle { color: var(--muted); max-width: 68ch; margin: 0 0 22px; font-size: 15px; }
+.stat-strip { display: flex; flex-wrap: wrap; gap: 10px; }
+.chip {
+  display: inline-flex; align-items: center; gap: 8px;
+  border: 1px solid var(--border); border-radius: 8px;
+  padding: 9px 14px; font-size: 13.5px; background: var(--surface-alt);
+}
+.chip .num { font-weight: 700; font-size: 15px; }
+.chip.crit { border-color: var(--bad); background: var(--bad-soft); color: var(--bad); }
+.chip.high { border-color: var(--warn); background: var(--warn-soft); color: var(--warn); }
+.chip.good { border-color: var(--good); background: var(--good-soft); color: var(--good); }
+
+/* ---------- Sidebar TOC ---------- */
+.toc {
+  position: sticky; top: 0; align-self: start;
+  max-height: 100vh; overflow-y: auto;
+  padding: 28px 20px 40px 32px;
+  border-right: 1px solid var(--border);
+}
+.toc-title { font-size: 11.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
+.toc ol { list-style: none; margin: 0; padding: 0; counter-reset: toc; }
+.toc li { counter-increment: toc; margin-bottom: 2px; }
+.toc a {
+  display: flex; gap: 8px; text-decoration: none; color: var(--muted);
+  font-size: 13px; padding: 6px 8px; border-radius: 6px;
+}
+.toc a::before { content: counter(toc, decimal-leading-zero); color: var(--accent); font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; flex-shrink: 0; }
+.toc a:hover { background: var(--surface-alt); color: var(--ink); }
+
+/* ---------- Main content ---------- */
+main { padding: 40px 48px 100px; min-width: 0; }
+section.block { margin-bottom: 56px; scroll-margin-top: 20px; }
+section.block h2 {
+  font-size: 22px; margin: 0 0 6px;
+  display: flex; align-items: baseline; gap: 10px;
+}
+section.block h2 .n { font-family: 'IBM Plex Mono', monospace; font-size: 14px; color: var(--accent); font-weight: 500; }
+section.block .lede { color: var(--muted); margin: 0 0 22px; font-size: 14.5px; }
+h3 { font-size: 17px; margin: 28px 0 10px; }
+h4 { font-size: 14.5px; margin: 18px 0 8px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); font-family: 'Public Sans', sans-serif; font-weight: 700; }
+
+.table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 10px; margin: 14px 0 22px; }
+table { border-collapse: collapse; width: 100%; min-width: 640px; font-size: 13.5px; background: var(--surface); }
+th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+th { background: var(--surface-alt); font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); font-weight: 700; }
+tr:last-child td { border-bottom: none; }
+
+.badge { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 11px; font-weight: 700; letter-spacing: 0.02em; white-space: nowrap; }
+.badge.crit { background: var(--bad-soft); color: var(--bad); }
+.badge.high { background: var(--warn-soft); color: var(--warn); }
+.badge.med { background: var(--accent-soft); color: var(--accent); }
+.badge.low { background: var(--surface-alt); color: var(--muted); }
+.badge.done { background: var(--good-soft); color: var(--good); }
+
+.callout { border-left: 3px solid var(--accent); background: var(--accent-soft); padding: 14px 18px; border-radius: 0 8px 8px 0; margin: 16px 0; font-size: 14px; }
+.callout.warn { border-color: var(--warn); background: var(--warn-soft); }
+.callout.bad { border-color: var(--bad); background: var(--bad-soft); }
+.callout.good { border-color: var(--good); background: var(--good-soft); }
+.callout p { margin: 0; max-width: none; }
+.callout strong { display: block; margin-bottom: 4px; }
+
+.opt-card { border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; margin-bottom: 10px; background: var(--surface); }
+.opt-card .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin-bottom: 4px; }
+.opt-card.final { border-color: var(--good); background: var(--good-soft); }
+.opt-card.final .label { color: var(--good); font-weight: 700; }
+.opt-card .chars { color: var(--muted); font-size: 12px; font-family: 'IBM Plex Mono', monospace; }
+
+.tree { font-family: 'IBM Plex Mono', monospace; font-size: 13px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 18px 22px; overflow-x: auto; line-height: 1.9; }
+.tree .h1 { color: var(--accent); font-weight: 700; }
+.tree .h2 { color: var(--ink); }
+.tree .h3 { color: var(--muted); }
+
+pre.code {
+  background: var(--code-bg); color: var(--code-ink);
+  border-radius: 10px; padding: 18px 20px; overflow-x: auto;
+  font-size: 12.5px; line-height: 1.6; margin: 10px 0 22px;
+}
+
+ul.plain, ol.plain { padding-left: 20px; }
+ul.plain li, ol.plain li { margin-bottom: 6px; }
+
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+@media (max-width: 720px) {
+  .two-col { grid-template-columns: 1fr; }
+  .layout { grid-template-columns: 1fr; }
+  .toc { position: static; border-right: none; border-bottom: 1px solid var(--border); max-height: none; }
+  main { padding: 28px 20px 80px; }
+  .header-band { padding: 28px 20px 22px; }
+}
+
+footer.doc-footer { grid-column: 1 / -1; padding: 24px 48px 50px; color: var(--muted); font-size: 12.5px; border-top: 1px solid var(--border); }
+</style>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<div class="layout">
+
+  <div class="header-band">
+    <div class="kicker">Homepage SEO &amp; Content Audit — codeksha.com</div>
+    <h1>Codeksha Homepage: SEO, Content &amp; Conversion Audit</h1>
+    <p class="subtitle">Grounded in the current homepage (<code>index.html</code>), the live site at codeksha.com, and a competitive scan of top-ranking Rajkot IT-training pages. Covers positioning, keywords, on-page copy, technical SEO, schema, local signals, trust, and a phased rollout plan. Items already applied to the homepage in this pass are marked <span class="badge done">Done</span>.</p>
+    <div class="stat-strip">
+      <div class="chip"><span class="num">62 / 100</span> Estimated current SEO health*</div>
+      <div class="chip crit"><span class="num">3</span> Critical issues</div>
+      <div class="chip high"><span class="num">6</span> High-priority items</div>
+      <div class="chip good"><span class="num">9</span> Changes applied today</div>
+    </div>
+  </div>
+
+  <nav class="toc">
+    <div class="toc-title">Contents</div>
+    <ol>
+      <li><a href="#exec">Executive summary</a></li>
+      <li><a href="#positioning">Positioning &amp; entity focus</a></li>
+      <li><a href="#keywords">Keyword map &amp; URL architecture</a></li>
+      <li><a href="#meta">Title tag &amp; meta description</a></li>
+      <li><a href="#headings">Heading structure</a></li>
+      <li><a href="#hero">Hero alternatives</a></li>
+      <li><a href="#content">Section-by-section content plan</a></li>
+      <li><a href="#structure">Recommended page structure</a></li>
+      <li><a href="#linking">Course discovery &amp; internal linking</a></li>
+      <li><a href="#local">Local SEO</a></li>
+      <li><a href="#eeat">E-E-A-T &amp; trust</a></li>
+      <li><a href="#reviews">Testimonials &amp; reviews audit</a></li>
+      <li><a href="#schema">Schema markup</a></li>
+      <li><a href="#images">Image SEO</a></li>
+      <li><a href="#faq">FAQ</a></li>
+      <li><a href="#cro">Conversion optimization</a></li>
+      <li><a href="#technical">Technical SEO audit</a></li>
+      <li><a href="#perf">Performance &amp; mobile UX</a></li>
+      <li><a href="#ai">AI search &amp; entity clarity</a></li>
+      <li><a href="#competitors">Competitor analysis</a></li>
+      <li><a href="#phases">Priority phases</a></li>
+      <li><a href="#donot">Do not do</a></li>
+      <li><a href="#elsewhere">Belongs on other pages</a></li>
+      <li><a href="#log">What changed today</a></li>
+    </ol>
+  </nav>
+
+  <main>
+
+    <section class="block" id="exec">
+      <h2><span class="n">01</span> Executive summary</h2>
+      <div class="two-col">
+        <div>
+          <h4>Strengths</h4>
+          <ul class="plain">
+            <li>Clear course lineup with real specifics (student counts, lesson counts, level) — better content depth than several competitors' thin course blurbs.</li>
+            <li>Genuine differentiators already present in copy: on-premise classroom training, developer-led teaching, live project work.</li>
+            <li>Real NAP (name, address, phone) already in the footer, consistent with the site's own contact details.</li>
+            <li>Existing testimonials are attributed to named students with roles — a real trust asset once expanded.</li>
+          </ul>
+        </div>
+        <div>
+          <h4>Weak areas found</h4>
+          <ul class="plain">
+            <li>Title tag was a leftover dev placeholder (<code>Codeksha Header &amp; Footer</code>) — zero SEO value. <span class="badge done">Fixed</span></li>
+            <li>No meta description, canonical, Open Graph, Twitter Card, or structured data anywhere on the page. <span class="badge done">Fixed</span></li>
+            <li>No FAQ section, despite strong "People Also Ask" opportunity for Rajkot IT-training queries. <span class="badge done">Fixed</span></li>
+            <li>H1 didn't name Codeksha as an IT training institute or mention Rajkot. <span class="badge done">Fixed</span></li>
+            <li>Primary nav items (About Us, All Courses, Gallery, Blog, Contact) all point to <code>#</code> — dead links with no destination pages yet.</li>
+            <li>No dedicated course, location, or blog pages exist in this project — every internal-linking recommendation below assumes those pages get built.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="callout warn">
+        <strong>*On the "62/100" figure</strong>
+        <p>This is a directional estimate, not a tool output — no crawler/Search Console access was available. It reflects: solid unique content and real trust signals, offset by the missing metadata/schema (now fixed), the absent FAQ (now fixed), and the fact that every keyword-specific destination this audit recommends (course pages, <code>/it-training-rajkot/</code>) doesn't exist yet, which caps how much the homepage alone can rank for.</p>
+      </div>
+      <h4>Biggest problems</h4>
+      <ol class="plain">
+        <li>No dedicated pages for individual courses or the Rajkot location term — the homepage is currently the only page competing for every keyword at once.</li>
+        <li>Dead-end primary navigation (four of six nav links go nowhere).</li>
+        <li>No schema, no FAQ, no meta description prior to this pass.</li>
+      </ol>
+      <h4>Biggest opportunities</h4>
+      <ol class="plain">
+        <li>Build <code>/it-training-rajkot/</code>, <code>/courses/</code>, and per-course pages, then let the homepage link out to them instead of trying to rank for everything itself.</li>
+        <li>Competitors lean hard on unverifiable "Best"/"100% placement" claims (see §20) — Codeksha can win trust by being specific and evidence-based instead, which also keeps it compliant with this brief's rules.</li>
+        <li>FAQ + FAQPage schema is close to free reach for "People Also Ask" boxes and AI-search citations, and every question shipped today is answerable from real site content.</li>
+      </ol>
+    </section>
+
+    <section class="block" id="positioning">
+      <h2><span class="n">02</span> Positioning &amp; entity focus</h2>
+      <p class="lede">The homepage should read as: <em>Codeksha is a Rajkot-based IT training institute teaching practical, project-based courses, taught by working developers.</em> Every section should reinforce a piece of that sentence without repeating the same keyword phrase.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Association</th><th>Where it now lives on the homepage</th></tr></thead>
+          <tbody>
+            <tr><td>IT training in Rajkot</td><td>H1 + footer address <span class="badge done">strengthened</span></td></tr>
+            <tr><td>Classroom training</td><td>Hero subtitle, "Why Codeksha" highlights, FAQ</td></tr>
+            <tr><td>Practical / real-world learning</td><td>Feature cards, "Why Codeksha", FAQ</td></tr>
+            <tr><td>Developer-led training</td><td>H1, hero subtitle, Premium Learning accordion, FAQ</td></tr>
+            <tr><td>Career-focused courses</td><td>"Career Tracks" feature card</td></tr>
+            <tr><td>Internship opportunities</td><td>"Internship Certificates" feature card + Premium accordion — <strong>keep as-is, do not add numbers/percentages</strong> since none are verifiable</td></tr>
+            <tr><td>Certification</td><td>"Skill Certified" hero metric — same caution: don't imply a named/accredited certification body unless one genuinely exists</td></tr>
+            <tr><td>Student support</td><td>Weak today — no dedicated support/community copy besides the Discord line in the accordion. Consider surfacing that more clearly.</td></tr>
+            <tr><td>Multiple IT courses</td><td>Course grid (5 courses), category pills</td></tr>
+            <tr><td>Verifiable Rajkot presence</td><td>Footer address + Google Maps link, phone, email <span class="badge done">now also in schema</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout bad">
+        <strong>Avoid</strong>
+        <p>No instance of "No. 1," "Best," or "Top" appears anywhere in the current copy or in anything added today — keep it that way. Competitors use these claims constantly (see §20); Codeksha differentiating by not overclaiming is a legitimate trust advantage.</p>
+      </div>
+    </section>
+
+    <section class="block" id="keywords">
+      <h2><span class="n">03</span> Keyword map &amp; URL architecture</h2>
+      <p class="lede">Prevents the homepage from cannibalizing a future <code>/it-training-rajkot/</code> page, <code>/courses/</code>, and individual course pages. None of these destination pages exist in the current project — treat the "recommended URL" column as the target architecture to build toward.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Keyword</th><th>Intent</th><th>Homepage target?</th><th>Recommended section</th><th>Recommended URL</th><th>Cannibalization risk</th></tr></thead>
+          <tbody>
+            <tr><td>IT Training Institute Rajkot</td><td>Broad, brand + service</td><td><span class="badge done">Yes</span></td><td>H1 / hero</td><td>Homepage (<code>/</code>)</td><td>Low — homepage is the natural target for this broad phrase</td></tr>
+            <tr><td>IT Training Rajkot</td><td>Broad local, high competition</td><td>Partial (mention only)</td><td>Hero copy, footer</td><td><code>/it-training-rajkot/</code> (primary)</td><td>High if both pages both push this exact phrase in title/H1 — assign the exact-match title to the dedicated page, homepage uses the "Institute" variant</td></tr>
+            <tr><td>IT Courses in Rajkot</td><td>Broad, course-discovery</td><td><span class="badge done">Yes</span></td><td>Courses overview section</td><td>Homepage + <code>/courses/</code></td><td>Medium — homepage covers the overview, <code>/courses/</code> owns the full directory</td></tr>
+            <tr><td>IT Training Classes Rajkot</td><td>Broad, near-duplicate of above</td><td>No (light mention only)</td><td>—</td><td><code>/it-training-rajkot/</code></td><td>High — don't create a separate page for this; it's a variant of "IT Training Rajkot"</td></tr>
+            <tr><td>Web Development Training Rajkot</td><td>Category-level</td><td>Partial</td><td>Course category / web dev course preview</td><td>Dedicated web-development course page</td><td>Medium</td></tr>
+            <tr><td>Full Stack Development Course Rajkot</td><td>Course-specific, high intent</td><td>No (preview + link only)</td><td>Full Stack course card</td><td>Dedicated Full Stack course page</td><td>Low if homepage only previews and links out</td></tr>
+            <tr><td>PHP Training Rajkot</td><td>Course-specific</td><td>No</td><td>Programming section link</td><td>Dedicated PHP course page</td><td>Low</td></tr>
+            <tr><td>Laravel Training Rajkot</td><td>Course-specific</td><td>No</td><td>Laravel course card</td><td>Dedicated Laravel course page</td><td>Low</td></tr>
+            <tr><td>WordPress Training Rajkot</td><td>Course-specific</td><td>No</td><td>WordPress course card</td><td>Dedicated WordPress course page</td><td>Low</td></tr>
+            <tr><td>UI UX Design Course Rajkot</td><td>Course-specific</td><td>No — <strong>flag:</strong> no dedicated UI/UX course currently exists on the site</td><td>—</td><td>Only create once a real UI/UX course exists</td><td>N/A</td></tr>
+            <tr><td>Graphic Design Course Rajkot</td><td>Course-specific</td><td>No — same flag as above</td><td>—</td><td>Only create once a real graphic design course exists</td><td>N/A</td></tr>
+            <tr><td>Digital Marketing Training Rajkot</td><td>Course-specific</td><td>No — a "Digital Marketing" category pill exists but no course card/detail is shown yet</td><td>Category pill only, until a real course page exists</td><td>Dedicated Digital Marketing course page (once built)</td><td>N/A until page exists</td></tr>
+            <tr><td>SEO Training Rajkot</td><td>Course-specific</td><td>No — same flag: no SEO course currently shown on the site</td><td>—</td><td>Only create once a real SEO course exists</td><td>N/A</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout">
+        <strong>Decision on "IT Training Rajkot" vs "IT Training Institute Rajkot"</strong>
+        <p>Since the brief indicates <code>/it-training-rajkot/</code> is (or will be) the page specifically optimized for the exact phrase "IT Training Rajkot," the homepage now targets the broader "IT Training Institute in Rajkot" / "IT Courses in Rajkot" framing instead — reflected in the new title, H1, and meta description. This keeps the two pages complementary rather than competing for the same query.</p>
+      </div>
+      <div class="callout bad">
+        <strong>Two keywords have no matching course today</strong>
+        <p>"UI UX Design Course Rajkot," "Graphic Design Course Rajkot," and "SEO Training Rajkot" don't correspond to any course currently shown on the homepage (only "Digital Marketing Course" exists as a category-pill label, with no detail card). Do not add pages, copy, or schema claiming these courses exist until they're genuinely offered — that would be a doorway/unsupported-claim issue.</p>
+      </div>
+    </section>
+
+    <section class="block" id="meta">
+      <h2><span class="n">04</span> Title tag &amp; meta description</h2>
+      <h3>Title tag options</h3>
+      <div class="opt-card"><div class="label">Option 1</div>IT Training Institute in Rajkot | Codeksha <span class="chars">(44 chars)</span></div>
+      <div class="opt-card"><div class="label">Option 2</div>Codeksha — IT Training &amp; Web Development Courses, Rajkot <span class="chars">(59 chars)</span></div>
+      <div class="opt-card"><div class="label">Option 3</div>IT Courses in Rajkot | Codeksha Training Institute <span class="chars">(51 chars)</span></div>
+      <div class="opt-card"><div class="label">Option 4</div>Codeksha: Practical IT Training Institute in Rajkot <span class="chars">(53 chars)</span></div>
+      <div class="opt-card"><div class="label">Option 5</div>Learn Web Development &amp; IT Skills in Rajkot | Codeksha <span class="chars">(56 chars)</span></div>
+      <div class="opt-card final"><div class="label">Final — implemented</div>IT Training Institute in Rajkot | Codeksha <span class="chars">(44 chars)</span></div>
+      <p>Chosen for length safety across devices, a natural (not exact-match-stuffed) primary phrase, and reserving the exact phrase "IT Training Rajkot" for the dedicated location page.</p>
+
+      <h3>Meta description options</h3>
+      <div class="opt-card"><div class="label">Option 1</div>Codeksha is an IT training institute in Rajkot teaching full stack, backend, frontend, Laravel and WordPress through classroom, project-based courses. <span class="chars">(153 chars)</span></div>
+      <div class="opt-card"><div class="label">Option 2</div>Practical, classroom-based IT courses in Rajkot — Full Stack Development, Backend, Frontend, Laravel and WordPress — taught by working developers. <span class="chars">(148 chars)</span></div>
+      <div class="opt-card"><div class="label">Option 3</div>Learn Full Stack Development, Backend Programming, Frontend Design, Laravel and WordPress at Codeksha's Rajkot classroom, taught by real developers. <span class="chars">(150 chars)</span></div>
+      <div class="opt-card"><div class="label">Option 4</div>Codeksha trains students in Rajkot through live, project-based IT courses — Full Stack, Backend, Frontend, Laravel and WordPress. Book a free demo class. <span class="chars">(156 chars)</span></div>
+      <div class="opt-card"><div class="label">Option 5</div>An IT training institute in Rajkot offering hands-on courses in web development, Laravel and WordPress, led by developers who build real projects. <span class="chars">(150 chars)</span></div>
+      <div class="opt-card final"><div class="label">Final — implemented</div>Codeksha is an IT training institute in Rajkot teaching full stack, backend, frontend, Laravel and WordPress through classroom, project-based courses. <span class="chars">(153 chars)</span></div>
+    </section>
+
+    <section class="block" id="headings">
+      <h2><span class="n">05</span> Heading structure</h2>
+      <p class="lede">One H1 (already true before and after this pass). H2/H3 nesting below is the target end-state — most H2s below already exist verbatim on the page; the ones marked <span class="badge high">add</span> are new and not yet built (FAQ's H2 is the one exception already shipped today).</p>
+      <div class="tree">
+<span class="h1">H1 — Learn From Real Developers at Codeksha's IT Training Institute in Rajkot</span> <span class="badge done">done</span>
+ <span class="h2">H2 — Explore top courses</span>
+  <span class="h3">H3 — Full Stack Development / Backend Programming / Frontend Design / Laravel / WordPress &amp; CMS Tools</span> (one H3 per course card, existing)
+ <span class="h2">H2 — Courses Categories Built for Today's Digital World</span>
+ <span class="h2">H2 — A modern way to learn, guided by real devs</span>
+  <span class="h3">H3 — Who will be teaching these courses? / Will I work on real-time projects? / Do I get internship opportunities? / Is there a community to connect with?</span> (accordion questions, existing)
+ <span class="h2">H2 — Satisfaction is always present</span> (testimonials)
+ <span class="h2">H2 — Frequently Asked Questions</span> <span class="badge done">done</span>
+  <span class="h3">H3 — one per FAQ question</span> <span class="badge high">recommended upgrade</span>
+ <span class="h2">H2 — Not just tutorials, real training that shapes you</span> (CTA banner)
+ <span class="h2">H2 — Sign up to receive our latest updates</span> (footer)
+      </div>
+      <div class="callout">
+        <strong>One recommended change</strong>
+        <p>The "Training Highlights" section (On-premise Classroom Training / Developer Turned Teachers / Live Project Exposure) currently uses only <code>&lt;h3&gt;</code> tags with no parent <code>&lt;h2&gt;</code> — it should sit under an H2 such as "Why Choose Codeksha" so the three highlights nest logically instead of floating as orphan H3s.</p>
+      </div>
+    </section>
+
+    <section class="block" id="hero">
+      <h2><span class="n">06</span> Hero alternatives</h2>
+      <p class="lede">Three alternative hero directions, each with a distinct primary keyword focus. Version A is the one implemented on the homepage today.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th></th><th>Version A — implemented</th><th>Version B — course-led</th><th>Version C — local-first</th></tr></thead>
+          <tbody>
+            <tr><td>H1</td><td>Learn From Real Developers at Codeksha's IT Training Institute in Rajkot</td><td>Practical IT Courses in Rajkot, Taught by Working Developers</td><td>Codeksha: Rajkot's Classroom-Based IT Training Institute</td></tr>
+            <tr><td>Supporting paragraph</td><td>Classroom, project-based courses in Full Stack Development, Backend Programming, Frontend Design, Laravel and WordPress — taught by working developers, not traditional teachers.</td><td>From Full Stack Development to Laravel and WordPress, every course pairs classroom instruction with real, hands-on project work — no entrance exam required.</td><td>On-premise classroom training in Rajkot covering Full Stack Development, Backend, Frontend, Laravel and WordPress, led by developers who build real client projects.</td></tr>
+            <tr><td>Primary CTA</td><td>Enroll Now → courses section</td><td>Explore Courses → courses section</td><td>Book a Free Demo Class → contact section</td></tr>
+            <tr><td>Secondary CTA</td><td>Call +91 6355559016</td><td>View course details</td><td>Get directions / WhatsApp</td></tr>
+            <tr><td>Keyword focus</td><td>"IT Training Institute Rajkot" (brand + broad)</td><td>"IT Courses in Rajkot" (discovery intent)</td><td>"IT Training Rajkot" local-map intent (only if the homepage is meant to also carry local intent alongside <code>/it-training-rajkot/</code>)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="block" id="content">
+      <h2><span class="n">07</span> Section-by-section content plan</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Section</th><th>Heading</th><th>Level</th><th>Target keyword / intent</th><th>Recommended internal links</th></tr></thead>
+          <tbody>
+            <tr><td>Hero</td><td>Learn From Real Developers at Codeksha's IT Training Institute in Rajkot</td><td>H1</td><td>IT Training Institute Rajkot</td><td>Courses section, Contact</td></tr>
+            <tr><td>Feature strip</td><td>(no heading — icon+text cards)</td><td>—</td><td>practical learning, career tracks, internships</td><td>—</td></tr>
+            <tr><td>Courses overview</td><td>Explore top courses</td><td>H2</td><td>IT Courses in Rajkot</td><td><code>/courses/</code>, each course page</td></tr>
+            <tr><td>Categories</td><td>Course Categories Built for Today's Digital World</td><td>H2</td><td>category-level intents</td><td>Category landing pages, once built</td></tr>
+            <tr><td>Why Codeksha (recommend adding parent heading)</td><td>Why Choose Codeksha</td><td>H2 <span class="badge high">add</span></td><td>practical/classroom training</td><td>About page</td></tr>
+            <tr><td>Premium Learning FAQ-style accordion</td><td>A modern way to learn, guided by real devs</td><td>H2</td><td>developer-led training, internships</td><td>—</td></tr>
+            <tr><td>Testimonials</td><td>Satisfaction is always present</td><td>H2</td><td>trust / social proof</td><td>Full reviews page, if one exists</td></tr>
+            <tr><td>FAQ <span class="badge done">added</span></td><td>Frequently Asked Questions</td><td>H2</td><td>PAA-style local queries</td><td>Contact, individual course pages</td></tr>
+            <tr><td>CTA banner</td><td>Not just tutorials, real training that shapes you</td><td>H2</td><td>conversion</td><td>Courses section</td></tr>
+            <tr><td>Newsletter / footer</td><td>Sign up to receive our latest updates</td><td>H2</td><td>—</td><td>About, Contact, social profiles</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout warn">
+        <strong>Not rewritten wholesale</strong>
+        <p>Per the brief's own instruction ("based only on actual services and verifiable website information"), most existing course descriptions, testimonials, and feature copy were left as-is rather than rewritten speculatively — they're already specific and human-sounding. The changes applied were additive (FAQ, metadata, schema) and corrective (H1, dead-link fix), not a full content rewrite.</p>
+      </div>
+    </section>
+
+    <section class="block" id="structure">
+      <h2><span class="n">08</span> Recommended page structure</h2>
+      <p class="lede">Current order is largely sound. Recommended adjustments:</p>
+      <ul class="plain">
+        <li><strong>Keep</strong> the existing order: Hero → Feature strip → Courses → Categories → Premium/accordion → Highlights → Testimonials → FAQ → CTA → Footer.</li>
+        <li><strong>Add heading</strong> "Why Choose Codeksha" as the H2 parent for the Highlights section (see §05).</li>
+        <li><strong>Do not add</strong> a separate "Popular Courses" section distinct from "Explore top courses" — that would duplicate the existing course grid.</li>
+        <li><strong>Do not add</strong> a full Rajkot "location section" with maps/landmarks beyond what's already in the footer — that content belongs on <code>/it-training-rajkot/</code>, not duplicated on the homepage (see §26).</li>
+        <li><strong>FAQ position</strong>: placed after testimonials and before the final CTA banner — trust-building content leads into the conversion ask, which is the standard high-converting order.</li>
+      </ul>
+    </section>
+
+    <section class="block" id="linking">
+      <h2><span class="n">09</span> Course discovery &amp; internal linking</h2>
+      <p class="lede">Every link below assumes the destination page exists. None of these pages exist in the current project — until they're built, keep using on-page anchors (e.g. <code>#courses</code>) rather than linking to URLs that would 404.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Destination</th><th>Source section</th><th>Anchor text</th><th>Purpose</th></tr></thead>
+          <tbody>
+            <tr><td>/it-training-rajkot/</td><td>Hero or footer address block</td><td>"our Rajkot training centre"</td><td>Local-intent hub page</td></tr>
+            <tr><td>/courses/</td><td>Courses overview, "View All Courses" button (already exists, currently <code>href="#"</code>)</td><td>"View All Courses" (existing)</td><td>Course directory</td></tr>
+            <tr><td>Full Stack Development page</td><td>Full Stack course card</td><td>"Full Stack Development course"</td><td>Course-specific detail</td></tr>
+            <tr><td>PHP page</td><td>New programming-course section (doesn't exist yet)</td><td>"PHP training"</td><td>Course-specific detail</td></tr>
+            <tr><td>Laravel page</td><td>Laravel course card</td><td>"Laravel course"</td><td>Course-specific detail</td></tr>
+            <tr><td>WordPress page</td><td>WordPress &amp; CMS Tools course card</td><td>"WordPress &amp; CMS training"</td><td>Course-specific detail</td></tr>
+            <tr><td>Frontend/UI page</td><td>Frontend Design course card</td><td>"Frontend Design course"</td><td>Course-specific detail</td></tr>
+            <tr><td>Digital Marketing page</td><td>Categories pill ("Digital Marketing Course")</td><td>"Digital Marketing course"</td><td>Only once a real course/page exists</td></tr>
+            <tr><td>About page</td><td>Premium Learning accordion / trust section</td><td>"our instructors"</td><td>Instructor credibility</td></tr>
+            <tr><td>Contact page/section</td><td>Primary hero CTA + final CTA banner</td><td>"Book Free Demo Class" (existing)</td><td>Conversion</td></tr>
+            <tr><td>FAQ</td><td>Nav + footer "FAQs" link</td><td>"FAQs"</td><td><span class="badge done">Now points to <code>#faq</code> instead of dead <code>#</code></span></td></tr>
+            <tr><td>Blog</td><td>Nav "Blog" link</td><td>"Blog"</td><td>Currently <code>#</code> — needs a real destination or should be removed from nav until one exists</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="block" id="local">
+      <h2><span class="n">10</span> Local SEO</h2>
+      <ul class="plain">
+        <li><strong>NAP</strong>: Address, phone (+91 6355559016), and email (info@codeksha.com) are consistent between the footer and the schema added today. Confirm these match the Google Business Profile listing exactly (suite/floor formatting, phone format) — this couldn't be verified without access to the GBP listing.</li>
+        <li><strong>Address</strong>: A-1110, RK Iconic, Near Sheetal Park, 150 Feet Ring Rd, Rajkot, Gujarat 360006 — already present in the footer and now in JSON-LD.</li>
+        <li><strong>Opening hours</strong>: not published anywhere on the site. Flagging rather than inventing — add real hours once confirmed, then add <code>openingHoursSpecification</code> to the schema.</li>
+        <li><strong>Geographic signals</strong>: consider adding a <code>geo</code> (latitude/longitude) property to the schema once confirmed, plus an embedded Google Map on a future <code>/it-training-rajkot/</code> or contact page (not the homepage, to avoid duplicating map content across pages).</li>
+        <li><strong>Nearby landmarks</strong>: the footer already references "Near Sheetal Park" — genuine and specific, keep it. Don't add more landmark references without confirming they're accurate.</li>
+        <li><strong>Local testimonials</strong>: several existing testimonials already reference Rajkot by name (Nensi's quote) — good, keep as-is; don't add fabricated Rajkot mentions to the others.</li>
+        <li><strong>Rajkot-focused FAQs</strong>: added — see §15.</li>
+      </ul>
+    </section>
+
+    <section class="block" id="eeat">
+      <h2><span class="n">11</span> E-E-A-T &amp; trust</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Signal</th><th>Current state</th><th>Recommendation</th></tr></thead>
+          <tbody>
+            <tr><td>Instructor profiles</td><td>Not present on the homepage — only a generic "Real Developer Mentor" illustration</td><td>Add real instructor names, photos, and specific experience once available; do not invent placeholder instructor bios</td></tr>
+            <tr><td>Instructor qualifications</td><td>Not published</td><td>Add only genuine credentials/experience when confirmed</td></tr>
+            <tr><td>Student testimonials</td><td>5 named testimonials with roles, appear genuine and specific</td><td>Keep; consider adding course name per testimonial if verifiable</td></tr>
+            <tr><td>Reviews / ratings</td><td>"4.85" rating shown in the hero metrics with no source cited</td><td><span class="badge high">Flag</span> — cite the source (Google, Justdial, etc.) or link to it; an uncited rating number reads as unverifiable to both users and search engines</td></tr>
+            <tr><td>Business identity</td><td>Real address, phone, email in footer</td><td>Keep; now duplicated correctly in schema</td></tr>
+            <tr><td>"Skill Certified" badge</td><td>Shown in hero metrics with no named certifying body</td><td><span class="badge high">Flag</span> — either name the actual certifying body/authority or soften the label to avoid implying third-party accreditation</td></tr>
+            <tr><td>"10+ Years of Experience"</td><td>Shown in hero metrics</td><td>Keep only if this refers to a verifiable founding/operating date</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout bad">
+        <strong>Not invented in this audit</strong>
+        <p>No student counts, placement percentages, certifications, accreditations, review counts, course durations, job guarantees, awards, partnerships, or rankings were added or altered. The two items flagged above (uncited rating, unnamed certifying body) were already on the page before this audit — they're surfaced as questions for verification, not fixed, since fixing them would require facts not available here.</p>
+      </div>
+    </section>
+
+    <section class="block" id="reviews">
+      <h2><span class="n">12</span> Testimonials &amp; reviews audit</h2>
+      <p class="lede">Five testimonials are attributed to named individuals (Harmi, Manthan, Nensi, Shivraj, Foram) with roles like "Backend Trainee @ Codeksha" and "Full Stack Developer." These read as genuine and specific rather than generic — no changes recommended to the text itself.</p>
+      <ul class="plain">
+        <li>Add the course each student took, if that information is accurate and available — strengthens both trust and topical relevance (e.g. linking a testimonial to the Backend Programming course).</li>
+        <li>The "4.85" rating and "10,000+ Students" metric in the hero are presented without a citation — recommend linking to the review source or adding a small "based on Google reviews" style attribution if that's where the number comes from.</li>
+        <li>Do not add star-rating schema (<code>AggregateRating</code>) unless the rating is sourced from a real, citable review platform — adding it without a verifiable source risks a manual action for misleading structured data.</li>
+      </ul>
+    </section>
+
+    <section class="block" id="schema">
+      <h2><span class="n">13</span> Schema markup</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Schema type</th><th>Belongs on homepage?</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>EducationalOrganization</td><td>Yes</td><td><span class="badge done">Added</span> — name, url, logo, email, phone, address, sameAs (social profiles)</td></tr>
+            <tr><td>WebSite</td><td>Yes</td><td><span class="badge done">Added</span> — name + url only; no <code>SearchAction</code>, since the site has no working search feature</td></tr>
+            <tr><td>FAQPage</td><td>Yes, homepage FAQ only</td><td><span class="badge done">Added</span> — mirrors the visible FAQ content exactly</td></tr>
+            <tr><td>LocalBusiness</td><td>Optional / not added</td><td>Not added — <code>EducationalOrganization</code> already carries the address; adding LocalBusiness too would duplicate the same entity under two types without new information</td></tr>
+            <tr><td>Course</td><td>No</td><td>Belongs on individual course pages, once built — needs real <code>provider</code>, and should omit <code>price</code>/<code>hasCourseInstance</code> fields until those facts are confirmed</td></tr>
+            <tr><td>BreadcrumbList</td><td>Not applicable to homepage</td><td>Add to course/location pages once the URL structure in §03 exists</td></tr>
+            <tr><td>AggregateRating / Review</td><td>No</td><td>Do not add — the "4.85" figure has no cited, crawlable source (see §12)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <h3>Implemented JSON-LD (as shipped in <code>index.html</code>)</h3>
+      <pre class="code">&lt;script type="application/ld+json"&gt;
+{
+  "@context": "https://schema.org",
+  "@type": "EducationalOrganization",
+  "name": "Codeksha",
+  "url": "https://codeksha.com/",
+  "logo": "https://codeksha.com/Images/Codeksha-Logo.png",
+  "email": "info@codeksha.com",
+  "telephone": "+91-6355559016",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "A-1110, RK Iconic, Near Sheetal Park, 150 Feet Ring Rd",
+    "addressLocality": "Rajkot",
+    "addressRegion": "Gujarat",
+    "postalCode": "360006",
+    "addressCountry": "IN"
+  },
+  "sameAs": [
+    "https://www.instagram.com/codeksha_official",
+    "https://www.linkedin.com/company/codeksha/",
+    "https://x.com/TeamCodeksha"
+  ]
+}
+&lt;/script&gt;</pre>
+      <p>Plus a minimal <code>WebSite</code> block and a <code>FAQPage</code> block whose questions match §15 exactly (both shipped in <code>index.html</code> — omitted here for length, see the file's <code>&lt;head&gt;</code>).</p>
+    </section>
+
+    <section class="block" id="images">
+      <h2><span class="n">14</span> Image SEO</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Image</th><th>Current alt</th><th>Recommendation</th></tr></thead>
+          <tbody>
+            <tr><td>Codeksha-Logo.png</td><td>"Codeksha"</td><td>Fine as-is (logo alt should stay short)</td></tr>
+            <tr><td>Full-Stack-Development.jpg</td><td>"Full Stack Development"</td><td>Improve to "Students in a Full Stack Development classroom session at Codeksha, Rajkot" if the photo shows an actual class; keep short if it's a stock/illustrative graphic</td></tr>
+            <tr><td>Backend-Development.jpg</td><td>"Backend Programming"</td><td>Similar — describe what's actually shown, not just the course name</td></tr>
+            <tr><td>review1–4.webp</td><td>"Harmi - Codeksha Review 1" etc.</td><td>Good — specific and descriptive, not keyword-stuffed</td></tr>
+            <tr><td>question.webp</td><td>"Codeksha Real Developer Mentor"</td><td>Fine as-is</td></tr>
+            <tr><td>app-animation.png</td><td>"Arrow animation"</td><td>Acceptable — this is a decorative graphic; empty <code>alt=""</code> would also be valid since it conveys no content information</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <ul class="plain">
+        <li><span class="badge done">Done</span> — added <code>loading="lazy"</code> to all below-the-fold images (course cards, testimonial avatars, CTA/footer logos, premium illustration).</li>
+        <li><span class="badge high">Not done</span> — explicit <code>width</code>/<code>height</code> attributes on all images (prevents CLS). Skipped in this pass because the real intrinsic dimensions of each file weren't verified; adding guessed values risks introducing layout shift rather than fixing it. Measure each asset and add real dimensions before shipping.</li>
+        <li><span class="badge med">Recommended</span> — serve WebP/AVIF for the remaining <code>.jpg</code>/<code>.png</code> course images (the testimonial images are already <code>.webp</code>); compress course card JPEGs, which are typically the largest assets on a page like this.</li>
+        <li>Filenames are already reasonably descriptive (<code>Full-Stack-Development.jpg</code>, <code>Backend-Development.jpg</code>) — no rename needed.</li>
+      </ul>
+    </section>
+
+    <section class="block" id="faq">
+      <h2><span class="n">15</span> FAQ <span class="badge done">Implemented</span></h2>
+      <p class="lede">Seven questions were added, each answerable from content already on the page — none of the unverifiable ones from the brief's suggested list (e.g. "What is the best IT training institute in Rajkot?") were included, since answering it would require an unsupported superlative claim.</p>
+      <ol class="plain">
+        <li>Which IT courses does Codeksha offer in Rajkot?</li>
+        <li>Is the training classroom-based or online?</li>
+        <li>Who teaches the courses at Codeksha?</li>
+        <li>Does Codeksha provide live-project training?</li>
+        <li>Is Codeksha suitable for beginners?</li>
+        <li>Is Laravel and WordPress training available in Rajkot?</li>
+        <li>Where is Codeksha located?</li>
+      </ol>
+      <p>FAQPage JSON-LD was added matching this content exactly (see §13). Digital Marketing and SEO training questions were deliberately excluded — no dedicated course card for either currently exists on the homepage, so an FAQ answer confirming them would be an unsupported claim.</p>
+    </section>
+
+    <section class="block" id="cro">
+      <h2><span class="n">16</span> Conversion rate optimization</h2>
+      <ul class="plain">
+        <li><strong>Hero CTA</strong>: "Enroll Now" exists and scrolls to courses — good. Consider a second, lower-commitment CTA next to it (e.g. "Call Us" or WhatsApp) for visitors not ready to browse courses yet.</li>
+        <li><strong>WhatsApp CTA</strong>: not present anywhere on the page. High-value addition for an Indian local-services audience — add a persistent WhatsApp icon/link (mobile-friendly, one tap to chat) once a business WhatsApp number is confirmed.</li>
+        <li><strong>Phone CTA</strong>: phone number is a working <code>tel:</code> link in the footer already — good. Consider surfacing it higher (e.g. in a sticky mobile bar) since it's currently only reachable after scrolling to the footer.</li>
+        <li><strong>Course discovery</strong>: the "View All Courses" and "View Detail" buttons are currently <code>href="#"</code> — need real destinations once course pages exist; until then they silently do nothing, which is a conversion leak.</li>
+        <li><strong>Mobile forms</strong>: the newsletter signup is the only form on the page and has no visible destination/handler in the current static markup — confirm it's wired to a real email service before launch.</li>
+        <li><strong>Final CTA</strong>: the CTA banner ("Not just tutorials, real training that shapes you") has no button — it's a statement, not a conversion point. Recommend adding a CTA button here, since this is the natural "final ask" position on the page.</li>
+      </ul>
+    </section>
+
+    <section class="block" id="technical">
+      <h2><span class="n">17</span> Technical SEO audit</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Issue</th><th>Priority</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>Placeholder title tag, no meta description</td><td><span class="badge crit">Critical</span></td><td><span class="badge done">Fixed</span></td></tr>
+            <tr><td>No canonical tag</td><td><span class="badge crit">Critical</span></td><td><span class="badge done">Fixed</span> — set to <code>https://codeksha.com/</code></td></tr>
+            <tr><td>No structured data</td><td><span class="badge high">High</span></td><td><span class="badge done">Fixed</span> — Organization/Educational, WebSite, FAQPage</td></tr>
+            <tr><td>Primary nav links to <code>#</code> (About, All Courses, Gallery, Blog, Contact)</td><td><span class="badge high">High</span></td><td>Not fixed — needs real destination pages first</td></tr>
+            <tr><td>No robots.txt / XML sitemap reviewed</td><td><span class="badge high">High</span></td><td>Not assessed — this project has no server/hosting config to audit; verify on the live deployment</td></tr>
+            <tr><td>No explicit image width/height (CLS risk)</td><td><span class="badge med">Medium</span></td><td>Not fixed — see §14</td></tr>
+            <tr><td>No Open Graph / Twitter Card tags</td><td><span class="badge med">Medium</span></td><td><span class="badge done">Fixed</span></td></tr>
+            <tr><td>Course "View Detail" / "View All Courses" buttons are dead links</td><td><span class="badge med">Medium</span></td><td>Not fixed — needs destination pages</td></tr>
+            <tr><td>Images not yet WebP/AVIF for course cards</td><td><span class="badge low">Low</span></td><td>Not fixed — needs asset conversion</td></tr>
+            <tr><td>HTTPS, redirects, 404s, Core Web Vitals, JS rendering</td><td>—</td><td>Not assessable from a local static file — must be checked on the live deployed domain with real crawl/PageSpeed data</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="block" id="perf">
+      <h2><span class="n">18</span> Performance &amp; mobile UX</h2>
+      <ul class="plain">
+        <li>Hero currently loads a 4-slide testimonial carousel (<code>hero-full-slider-track</code>) with 4 large images up front — consider lazy-loading slides 2–4 and eager-loading only the first, since the first slide is the actual LCP candidate.</li>
+        <li>Course card and CMS images should compress and convert to WebP (see §14) — these are likely the largest transferred assets on the page.</li>
+        <li>Mobile nav already has a working hamburger menu with overlay — good, no changes needed.</li>
+        <li>Tap targets (nav links, course card buttons, hamburger) already appear appropriately sized in the existing CSS — no changes made.</li>
+        <li>Click-to-call already works via <code>tel:</code> link; recommend adding WhatsApp per §16 for a second one-tap contact method.</li>
+      </ul>
+    </section>
+
+    <section class="block" id="ai">
+      <h2><span class="n">19</span> AI search &amp; entity clarity</h2>
+      <p class="lede">The changes in this pass directly support this: a clear H1 statement of what Codeksha is and where it operates, an <code>EducationalOrganization</code> schema block naming the entity/location/contact unambiguously, and an FAQ section phrased as direct question/answer pairs — the format AI Overviews and answer engines lift most readily.</p>
+      <ul class="plain">
+        <li>Keep NAP identical across the homepage, schema, and any external listings (Google Business Profile, Justdial, etc.) — inconsistency is one of the most common reasons entities get fragmented across knowledge graphs.</li>
+        <li>Internal linking to real course and location pages (once built) further reinforces the Codeksha ↔ Rajkot ↔ [course] associations for both traditional and AI search.</li>
+        <li>Avoid vague self-description ("we are the best...") — AI summarization tools tend to surface concrete, specific claims over marketing language, which also happens to be what this brief requires anyway.</li>
+      </ul>
+    </section>
+
+    <section class="block" id="competitors">
+      <h2><span class="n">20</span> Competitor analysis</h2>
+      <p class="lede">Based on a live search scan (not a rank-tracking tool) for "IT training institute Rajkot" and "web development training Rajkot full stack course institute." Treat this as directional pattern-matching, not a verified top-5 ranking snapshot.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Site</th><th>Pattern observed</th></tr></thead>
+          <tbody>
+            <tr><td>TOPS Technologies</td><td>Heavy use of "100k+ students trained," "100% placement assistance" — exact-match title tags per course+city combination</td></tr>
+            <tr><td>Codizious / ittrainingrajkot.com</td><td>Leads with "ISO 9001:2015 certified" as a trust signal, lists 29+ courses on one hub page</td></tr>
+            <tr><td>Webcare Infoway, Shree Academy, QuickXpert</td><td>Dedicated landing page per course+city keyword (e.g. <code>/full-stack-web-developer-course-in-rajkot</code>) — confirms the "one URL per keyword" architecture recommended in §03</td></tr>
+            <tr><td>Common pattern across most results</td><td>"Best," unqualified placement percentages, and job-guarantee-adjacent language appear frequently</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <h4>What competitors do better</h4>
+      <ul class="plain">
+        <li>Dedicated, keyword-specific URLs for every course+city combination — Codeksha has none yet (see §26).</li>
+        <li>Loud trust badges (ISO certification, placement stats) — even where unverifiable, they're common enough that their absence may read as a gap to some visitors.</li>
+      </ul>
+      <h4>Where Codeksha can be better, not by copying</h4>
+      <ul class="plain">
+        <li>Specific, named student testimonials with real roles — most competitor sites in this scan lean on generic star ratings instead of named quotes.</li>
+        <li>Evidence-based, non-superlative positioning is a genuine differentiator given how saturated "Best"/"100%" claims are in this space — Codeksha can earn trust by being the institute that doesn't do that.</li>
+        <li>A real FAQ answering specific course/format questions (now shipped) — several competitor pages bury this or skip it entirely.</li>
+      </ul>
+      <p class="lede" style="margin-top:8px">Backlink-strength comparison was not performed — no backlink-analysis tool access was available in this session.</p>
+    </section>
+
+    <section class="block" id="phases">
+      <h2><span class="n">21</span> Priority phases</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Phase</th><th>Scope</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>1 — Immediate</td><td>Title, meta description, canonical, robots, OG/Twitter tags, core schema, fix H1</td><td><span class="badge done">Done</span></td></tr>
+            <tr><td>2 — Homepage optimization</td><td>FAQ + FAQPage schema, heading nesting fix ("Why Choose Codeksha" parent), image lazy-loading</td><td>FAQ/schema/lazy-load <span class="badge done">done</span>; heading-nesting fix still open</td></tr>
+            <tr><td>3 — Local SEO</td><td>Confirm opening hours, add geo coordinates, verify GBP/NAP match exactly</td><td>Not started — needs information not available in this session</td></tr>
+            <tr><td>4 — Supporting pages</td><td>Build <code>/it-training-rajkot/</code>, <code>/courses/</code>, individual course pages; wire up dead nav links</td><td>Not started</td></tr>
+            <tr><td>5 — Authority building</td><td>Genuine reviews, local citations, backlinks, digital PR</td><td>Outside this project's scope</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="block" id="donot">
+      <h2><span class="n">22</span> Do not do</h2>
+      <ul class="plain">
+        <li>Don't force every keyword from §03 into the homepage — most course-specific and design/marketing terms belong on dedicated pages that don't exist yet.</li>
+        <li>Don't duplicate whatever <code>/it-training-rajkot/</code> is meant to cover onto the homepage.</li>
+        <li>Don't add student counts, placement rates, certifications, awards, or partnerships that aren't already verifiably true.</li>
+        <li>Don't use "Best," "Top," or "No. 1" anywhere.</li>
+        <li>Don't add LocalBusiness/AggregateRating schema without a citable rating source.</li>
+        <li>Don't invent opening hours, geo-coordinates, or landmark references.</li>
+      </ul>
+    </section>
+
+    <section class="block" id="elsewhere">
+      <h2><span class="n">23</span> Belongs on other pages</h2>
+      <ul class="plain">
+        <li>Exact-match "IT Training Rajkot" targeting → <code>/it-training-rajkot/</code></li>
+        <li>Full course directory → <code>/courses/</code></li>
+        <li>Course-specific copy, schema, duration/syllabus/fees/eligibility → individual course pages (Full Stack, PHP, Laravel, WordPress, Frontend/UI, Digital Marketing, SEO, Graphic Design — the last three only once those courses genuinely exist)</li>
+        <li>Detailed course FAQs and course-specific structured data → individual course pages</li>
+        <li>In-depth blog/informational content → blog (doesn't exist yet)</li>
+      </ul>
+    </section>
+
+    <section class="block" id="log">
+      <h2><span class="n">24</span> What changed today (implementation log)</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>File</th><th>Change</th></tr></thead>
+          <tbody>
+            <tr><td><code>index.html</code> &lt;head&gt;</td><td>New title, meta description, robots, canonical, Open Graph, Twitter Card, EducationalOrganization + WebSite + FAQPage JSON-LD</td></tr>
+            <tr><td><code>index.html</code> hero</td><td>Rewrote H1 and hero subtitle to name Codeksha as an IT training institute in Rajkot and list its actual courses</td></tr>
+            <tr><td><code>index.html</code> nav + footer</td><td>"FAQs" links now point to <code>#faq</code> instead of a dead <code>#</code></td></tr>
+            <tr><td><code>index.html</code> new section</td><td>Added a 7-question FAQ section before the CTA banner</td></tr>
+            <tr><td><code>index.html</code> images</td><td>Added <code>loading="lazy"</code> to below-the-fold images (course cards, testimonial avatars, premium illustration, CTA/footer logos)</td></tr>
+            <tr><td><code>style.css</code></td><td>Added FAQ section styles matching the existing accordion visual language</td></tr>
+            <tr><td><code>script.js</code></td><td>Added a scoped FAQ accordion toggle, kept separate from the existing Premium Learning accordion to avoid cross-closing between the two groups</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="doc-footer">
+    Prepared for the Codeksha homepage (<code>index.html</code>) — Version 1. Scope: homepage only. Grounded in the live homepage source, codeksha.com, and a limited live web search for competitor context; no crawler, Search Console, PageSpeed, or backlink-tool data was available in this session — items requiring that data are marked "not assessed" above rather than guessed.
+  </footer>
+
+</div>
